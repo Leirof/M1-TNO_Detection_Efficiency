@@ -1,17 +1,22 @@
 from numpy import *
 
 class CCD():
+    __slots__ = ('__dict__','id','num','data','shot','triplet','block','dataPath'
+                'sky_background','background_average','background_median','background_std','background_proportion')
 
-    all = []
-    count = 0
-    lastUsedID = 0
+    all = {}
+    lastID = 0
 
-    def __init__(self, num = None, data = None):
-        self.id = CCD.lastUsedID
-        CCD.lastUsedID += 1
+    def __init__(self, num = None, data = None, shot = None, triplet = None, block = None, dataPath = None):
+        self.id = CCD.lastID
+        CCD.lastID += 1
         self.num = num
         self.data = data
-        CCD.all.append(self)
+        self.shot = shot
+        self.triplet = triplet
+        self.block = block
+        self.dataPath = dataPath
+        CCD.all.update({self.id:self})
 
     def compute_sky_background(self, verbose = False, prefix = ""):
         """This function compute the sky background"""

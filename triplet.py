@@ -1,12 +1,13 @@
 
 class Triplet():
+    __slots__ = ('__dict__','id','shotList','block','dataPath')
 
-    all = []
-    count = 0
-    lastUsedID = 0
+    all = {}
 
-    def __init__(self, num = None, shotList = []):
-        self.id = Triplet.lastUsedID
-        Triplet.lastUsedID += 1
-        self.num = num
-        self.shotList = shotList
+    def __init__(self, id = None, shots = [], block = None, dataPath = None):
+        self.id = id
+        self.shots = shots
+        self.block = block
+        self.dataPath = dataPath
+        if id in Triplet.all: raise ValueError("A triplet with this ID already exist")
+        Triplet.all.update({self.id:self})
