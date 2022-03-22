@@ -4,7 +4,7 @@ This file allow to connect this program with different type of data classificati
 You can edit it in order to allow the program to treat your data.
 """
 
-DATA_ROOTS = ["D:/Lab Project/OSSOS/dbimages/Triplets","D:/Lab Project/data/dbimages/Triplets_2","D:/Lab Project/data/dbimages/Missing"]
+DATA_ROOTS = ["D:/Lab Project/OSSOS/dbimages/Triplets"]
 
 from block import Block
 from triplet import Triplet
@@ -46,7 +46,7 @@ def connectData(verbose=False):
             
             # Reading all shots ID and making them correspond to their parent triplet and/or block
             if reading == "triplet":
-                currentShot = Shot(id=int(line[:-1]),triplet=currentTriplet,block=currentBlock)
+                currentShot = Shot(id=line[:-1],triplet=currentTriplet,block=currentBlock)
                 currentTriplet.shots.append(currentShot)
                 if verbose: print(f"      Shot {line[:-1]}")
             
@@ -54,8 +54,7 @@ def connectData(verbose=False):
                 currentShot = Shot(id=line[:-1],block=currentBlock)
                 currentBlock.orphanShots.append(currentShot)
                 if verbose: print(f"   Orphan shot {line[:-1]}")
-
-    associatePath(verbose=False)
+    print(f"Readed {len(Block.all)} blocks, {len(Triplet.all)} triplets, {len(Shot.all)} shots, {len(CCD.all)} CCDs, ")
 
 
 def associatePath(verbose=False):
@@ -67,7 +66,7 @@ def associatePath(verbose=False):
 
     for root in DATA_ROOTS:
         for folder in os.listdir(root):
-            if folder in Shot.all:
+            if folder in Shot.all.keys():
                 if Shot.all[folder].dataPath is not None:
                     duplicatedFolder +=1
                     print(f"Duplicated folder:\n   {Shot.all[folder].dataPath}\n      {os.listdir(Shot.all[folder].dataPath)}\n   {os.path.join(root,folder)}\n      {os.listdir(os.path.join(root,folder))}")
@@ -103,5 +102,5 @@ def getCCD(ccd):
 
 
 if __name__ == "__main__":
-    connectData(verbose=True)
-    print(f"Readed {len(Block.all)} blocks, {len(Triplet.all)} triplets, {len(Shot.all)} shots, {len(CCD.all)} CCDs, ")
+    connectData(verbose=False)
+    associatePath(verbose=False)
