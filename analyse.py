@@ -54,6 +54,8 @@ if __name__ == '__main__':
 
         args = []
         path = f"{save_results_in}/Triplets/{numTriplet}"
+        save_ccd_as_png(ccds[0],"test.png")
+        save_ccd_as_png(ccds_background[0],"test_background.png")
         for i in range(len(ccds)):
             args.append((path,i,ccds[i],ccds_background[i],len(ccds)))
         print("   Saving results...")

@@ -1,7 +1,12 @@
-
 """
 This file allow to connect this program with different type of data classification system.
 You can edit it in order to allow the program to treat your data.
+
+This file must contain at leat the following functions:
+- connectData : allow to create objects with basic informations (id, path to data)
+- getBlock, getTriplet, getShot, getCCD : allow to fill all the informations of the object using the basic information already available in these objects
+
+All the data cannot be stored entirely in the RAM, so each object will load data when needed by using these get functions.
 """
 
 ##################################################
@@ -105,9 +110,41 @@ def getShot(shot):
 
 def getCCD(ccd):
     """This function use the informations contained in the CCD object to find the corresponding data and fill the missing parts"""
-
     return ccd
 
 if __name__ == "__main__":
     connectData(verbose=False)
-    #associatePath(verbose=False)
+
+    
+#   __  __ _         _                   _       _        
+#  |  \/  (_)       (_)                 | |     | |       
+#  | \  / |_ ___ ___ _ _ __   __ _    __| | __ _| |_ __ _ 
+#  | |\/| | / __/ __| | '_ \ / _` |  / _` |/ _` | __/ _` |
+#  | |  | | \__ \__ \ | | | | (_| | | (_| | (_| | || (_| |
+#  |_|  |_|_|___/___/_|_| |_|\__, |  \__,_|\__,_|\__\__,_|
+#                             __/ |                       
+#                            |___/                       
+
+
+    with open("listFWHM","w+") as file, open("listAPCOR","w+") as file2, open("listZEROPOINT","w+") as file3:
+        count = 0
+        count2 = 0
+        count3 = 0
+        for ccd in CCD.all.values():
+            if not os.path.isfile(os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.fwhm")):
+                file.write(ccd.uid + "\n")
+                print(os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.fwhm"))
+                count += 1
+            if not os.path.isfile(os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.apcor")):
+                file2.write(ccd.uid + "\n")
+                print(os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.apcor"))
+                count2 += 1
+        
+            if not os.path.isfile(os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.zeropoint.used")):
+                file3.write(ccd.uid + "\n")
+                print(os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.zeropoint.used"))
+                count3 += 1
+
+    print(count)
+    print(count2)
+    print(count3)
