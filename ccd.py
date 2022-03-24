@@ -7,16 +7,14 @@ class CCD():
     all = {}
     lastID = 0
 
-    def __init__(self, num = None, data = None, shot = None, triplet = None, block = None, dataPath = None):
-        self.id = CCD.lastID
-        CCD.lastID += 1
-        self.num = num
+    def __init__(self, id = None, data = None, shot = None, triplet = None, block = None, dataPath = None):
+        self.num = id
         self.data = data
         self.shot = shot
         self.triplet = triplet
         self.block = block
         self.dataPath = dataPath
-        CCD.all.update({self.id:self})
+        CCD.all.update({f"{self.shot.id}_{self.num}":self})
 
     def compute_sky_background(self, verbose = False, prefix = ""):
         """This function compute the sky background"""
