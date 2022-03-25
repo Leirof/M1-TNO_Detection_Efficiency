@@ -4,9 +4,9 @@ class Triplet():
 
     all = {}
 
-    def __init__(self, id = None, shots = [], block = None, dataPath = None):
+    def __init__(self, id = None, shotList = [], block = None, dataPath = None):
         self.id = id
-        self.shots = shots
+        self.shotList = shotList
         self.block = block
         self.dataPath = dataPath
         if id in Triplet.all: raise ValueError("A triplet with this ID already exist")

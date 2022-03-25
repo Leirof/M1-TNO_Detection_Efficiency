@@ -20,6 +20,8 @@ from shot import Shot
 from ccd import CCD
 import os
 from astropy.io import fits
+from numpy import *
+from utils.term import *
 
 #    _____      _      ____  _     _           _         _      _     _   
 #   / ____|    | |    / __ \| |   (_)         | |       | |    (_)   | |  
@@ -36,7 +38,10 @@ def connectData(verbose=False):
 
     # Reading All_triplets file
     with open(DATA_LIST) as file:
+        if verbose == True: print("Scanning data...",end="\r")
+        if verbose == 2: print("Scanning data...")
         for line in file:
+
             if line == "\n":
                 continue
 
@@ -49,19 +54,19 @@ def connectData(verbose=False):
                 if "block" in line:
                     reading = "messy_block"
                     currentBlock = Block(id=line[1:-7])
-                    if verbose: print(f"Messy block {line[1:-7]}")
+                    if verbose == 2: print(f"   Messy block {line[1:-7]}")
 
                 # If the shots are organised by triplets
                 else:
                     reading = "triplet"
                     if line[1:-5] not in Block.all:
                         currentBlock = Block(id=line[1:-5])
-                        if verbose: print(f"Block {line[1:-5]}")
+                        if verbose == 2: print(f"   Block {line[1:-5]}")
                     else: currentBlock = Block.all[line[1:-5]] # Just to be sure to have the correct block
 
                     currentTriplet = Triplet(id=line[1:-1], block=currentBlock)
                     currentBlock.triplets.append(currentTriplet)
-                    if verbose: print(f"   Triplet {line[1:-1]}")
+                    if verbose == 2: print(f"      Triplet {line[1:-1]}")
                 continue
             
             # __________________________________________________
@@ -71,15 +76,17 @@ def connectData(verbose=False):
             if reading == "triplet":
                 currentShot = Shot(id=line[:-1],triplet=currentTriplet,block=currentBlock, dataPath=os.path.join(DATA_ROOT,line[:-1]))
                 get_ccdList(currentShot)
-                currentTriplet.shots.append(currentShot)
-                if verbose: print(f"      Shot {line[:-1]}")
+                currentTriplet.shotList.append(currentShot)
+                if verbose == 2: print(f"         Shot {line[:-1]} with {len(currentShot.ccdList)} CCDs")
             
             if reading == "messy_block":
                 currentShot = Shot(id=line[:-1],block=currentBlock, dataPath=os.path.join(DATA_ROOT,line[:-1]))
                 get_ccdList(currentShot)
                 currentBlock.orphanShots.append(currentShot)
-                if verbose: print(f"   Orphan shot {line[:-1]}")
-    print(f"Readed {len(Block.all)} blocks, {len(Triplet.all)} triplets, {len(Shot.all)} shots, {len(CCD.all)} CCDs, ")
+                if verbose == 2: print(f"      Orphan shot {line[:-1]} with {len(currentShot.ccdList)} CCDs")
+    
+    if verbose == True: print("Scanning data... Done")
+    if verbose: print(f"-> Found {len(Block.all)} blocks, {len(Triplet.all)} triplets, {len(Shot.all)} shots (including {len(Shot.all) - 3*len(Triplet.all)} orphan shots) and {len(CCD.all)} CCDs")
 
 def get_ccdList(shot):
     for i in os.listdir(shot.dataPath):
@@ -104,12 +111,24 @@ def getTriplet(triplet):
     """This function use the informations contained in the triplet object to find the corresponding data and fill the missing parts"""
     return triplet
 
-def getShot(shot):
+def getShot(shot, verbose=False, prefix=""):
     """This function use the informations contained in the shot object to find the corresponding data and fill the missing parts"""
+    hdul = fits.open(os.path.join(shot.dataPath,f"{shot.id}p.fits.fz"))
+
+    if verbose: print(f"{prefix}Getting data for shot {shot.id}...")    
+    for i in range(len(hdul)-1):
+        if verbose: progressbar(i/(len(hdul)-2),prefix=f"{prefix}   ")
+        for ccd in shot.ccdList:
+            if i == int(ccd.id):
+                ccd.data = hdul[i].data
     return shot
 
 def getCCD(ccd):
     """This function use the informations contained in the CCD object to find the corresponding data and fill the missing parts"""
+    hdul = fits.open(os.path.join(ccd.shot.dataPath,f"{ccd.shot.id}p.fits.fz"))
+    for i in range(len(hdul)-1):
+        if i == int(ccd.id):
+            ccd.data = hdul[i].data
     return ccd
 
 if __name__ == "__main__":

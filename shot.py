@@ -4,9 +4,9 @@ class Shot():
 
     all = {}
 
-    def __init__(self, id, ccds = [], triplet = None, block = None, dataPath = None):
+    def __init__(self, id, ccdList = [], triplet = None, block = None, dataPath = None):
         self.id = id
-        self.ccds = ccds
+        self.ccdList = ccdList
         self.triplet = triplet
         self.block = block
         self.dataPath = dataPath
