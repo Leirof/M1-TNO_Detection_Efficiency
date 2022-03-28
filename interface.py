@@ -115,7 +115,6 @@ def loadCCD(ccd):
                 ccd.data = hdul[i].data
 
     ccd.fwhm = loadtxt(os.path.join(ccd.dataPath,f"{ccd.uid}.fwhm"))
-    print(f"CCD{ccd.id} FWHM={ccd.fwhm}")
 
     apcor = loadtxt(os.path.join(ccd.dataPath,f"{ccd.uid}.apcor"))
     ccd.apcor_inner_radius = apcor[0]
@@ -123,53 +122,54 @@ def loadCCD(ccd):
     ccd.apcor_factor       = apcor[2]
     ccd.apcor_uncertainty  = apcor[3]
     
+    apcor.zeropoint = loadtxt(os.path.join(ccd.dataPath,f"{ccd.uid}.zeropoint.used"))
+
+    ccd.trans_mat = loadtxt(os.path.join(ccd.dataPath,f"{ccd.uid}.trans.jmp"))
+
     return ccd
 
-# if __name__ == "__main__":
-#     connectData(verbose=False)
+#   _______        _     _____        _           _____                _     _                        
+#  |__   __|      | |   |  __ \      | |         / ____|              (_)   | |                       
+#     | | ___  ___| |_  | |  | | __ _| |_ __ _  | |     ___  _ __  ___ _ ___| |_ ___ _ __   ___ _   _ 
+#     | |/ _ \/ __| __| | |  | |/ _` | __/ _` | | |    / _ \| '_ \/ __| / __| __/ _ \ '_ \ / __| | | |
+#     | |  __/\__ \ |_  | |__| | (_| | || (_| | | |___| (_) | | | \__ \ \__ \ ||  __/ | | | (__| |_| |
+#     |_|\___||___/\__| |_____/ \__,_|\__\__,_|  \_____\___/|_| |_|___/_|___/\__\___|_| |_|\___|\__, |
+#                                                                                                __/ |
+#                                                                                               |___/
 
-    
-# #   __  __ _         _                   _       _        
-# #  |  \/  (_)       (_)                 | |     | |       
-# #  | \  / |_ ___ ___ _ _ __   __ _    __| | __ _| |_ __ _ 
-# #  | |\/| | / __/ __| | '_ \ / _` |  / _` |/ _` | __/ _` |
-# #  | |  | | \__ \__ \ | | | | (_| | | (_| | (_| | || (_| |
-# #  |_|  |_|_|___/___/_|_| |_|\__, |  \__,_|\__,_|\__\__,_|
-# #                             __/ |                       
-# #                            |___/                       
+if __name__ == "__main__":
+    connectData(verbose=False)
 
+    files_to_check = [
+        "fwhm",
+        "apcor",
+        "zeropoint.used",
+        "trans.jmp"
+    ]
+    list_dest = "D:/Lab_Project/incomplet/" # destination of the lists of incompelte ccds
+    ccd_dest = "D:/Lab_Project/incomplet/missing_trans_mat/" # new location for incomplet ccd
 
-#     with open("listFWHM","w+") as file, open("listAPCOR","w+") as file2, open("listZEROPOINT","w+") as file3:
-#         count = 0
-#         count2 = 0
-#         count3 = 0
-#         incomplet = []
-#         for ccd in CCD.all.values():
-#             if not os.path.isfile(os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.fwhm")):
-#                 if ccd not in incomplet:
-#                     incomplet.append(ccd)
-#                 file.write(ccd.uid + "\n")
-#                 print(os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.fwhm"))
-#                 count += 1
-#             if not os.path.isfile(os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.apcor")):
-#                 if ccd not in incomplet:
-#                     incomplet.append(ccd)
-#                 file2.write(ccd.uid + "\n")
-#                 print(os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.apcor"))
-#                 count2 += 1
+    count = zeros(len(files_to_check))
+    incomplet = []
+
+    for ext in files_to_check:
+        os.remove(os.path.join(list_dest,ext+"_list.txt")) 
+
+    for ccd in CCD.all.values():
+        for i, ext in enumerate(files_to_check):
+            if not os.path.isfile(os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.{ext}")):
+                if ext == "trans.jmp" and ccd not in incomplet: incomplet.append(ccd)
+                with open(os.path.join(list_dest,ext+"_list.txt"),"a") as file: file.write(ccd.uid + "\n")
+                print(os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.{ext}"))
+                count[i] += 1
+
+    for ccd in incomplet:
+        print(ccd.id)
+        if not os.path.isdir(os.path.join(ccd_dest,ccd.shot.id)): os.makedirs(os.path.join(ccd_dest,ccd.shot.id))
+        os.rename(ccd.dataPath, os.path.join(ccd_dest,ccd.shot.id,"ccd" + ccd.id))
         
-#             if not os.path.isfile(os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.zeropoint.used")):
-#                 if ccd not in incomplet:
-#                     incomplet.append(ccd)
-#                 file3.write(ccd.uid + "\n")
-#                 print(os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.zeropoint.used"))
-#                 count3 += 1
 
-#         for ccd in incomplet:
-#             print(f"{ccd.uid}")
-#             if not os.path.isdir(f"D:\Lab_Project/incomplet/{ccd.shot.id}/"): os.makedirs(f"D:\Lab_Project/incomplet/{ccd.shot.id}/")
-#             os.rename(ccd.dataPath, f"D:\Lab_Project/incomplet/{ccd.shot.id}/ccd{ccd.id}")
-
-#     print(count)
-#     print(count2)
-#     print(count3)
+    for i, ext in enumerate(files_to_check):
+        print(f"Found {count[i]} CCDs with no '{ext}' file.")
+    
+    print(f"A total of {len(incomplet)} CCDs are incomplet.")

@@ -3,41 +3,6 @@ from utils.term import *
 
 mp_stop = False  
 
-# Test de multithread
-
-# def mp_compute_sky_backgroud(ccd, totalCCD=-1, verbose=False, prefix=""):
-#     """Allow to parrallelize the call of sky_backgroud()"""
-#     global mp_stop
-#     if mp_stop: return
-#     try:
-#         if verbose == 2: print(f"{prefix}Computing sky background of CCD {int(ccd.id)}...")
-#         if verbose == True: progressbar(int(ccd.id) / (totalCCD-1), prefix=prefix)
-
-#         compute_sky_background(ccd)
-
-#         if verbose == 2: print(f"{prefix}Sky background of CCD {int(ccd.id)} computed.")
-#     except KeyboardInterrupt: mp_stop = True
-
-# def compute_sky_background(ccd, verbose = False, prefix = ""):
-#         """This function compute the sky background"""
-#         img = ccd.data
-
-#         for i in range(3):
-#             a = mean(img[img!=0]); s = std(img[img!=0])
-#             if verbose: print(f"{prefix}Loop {i}: Median={round(median(img),2)}, Average={round(a,2)}, Standrad deviation={round(s,2)}")
-#             img = img * (img < a+3*s) * (img > a-3*s)
-
-#         m = median(img); a = mean(img[img!=0]); s = std(img[img!=0])
-#         if verbose: print(f"{prefix}Loop {i}: Median={round(m,2)}, Average={round(a,2)}, Standrad deviation={round(s,2)}")
-
-#         sizeX, sizeY = img.shape
-
-#         ccd.sky_background = img
-#         ccd.background_median = m
-#         ccd.background_average = a
-#         ccd.background_std = s
-#         ccd.background_proportion = sum(img!=0) / (sizeX*sizeY)
-
 #    _____ _____ _____  
 #   / ____/ ____|  __ \ 
 #  | |   | |    | |  | |
@@ -49,7 +14,9 @@ class CCD():
     __slots__ = ('__dict__','uid','id','data','shot','triplet','block','dataPath',
                 'sky_background','background_average','background_median','background_std','background_proportion',
                 'fwhm',
-                'apcor_inner_radius', 'apcor_outer_radius', 'apcor_factorn', 'apcor_uncertainty')
+                'apcor_inner_radius', 'apcor_outer_radius', 'apcor_factorn', 'apcor_uncertainty',
+                'zeropoint',
+                'trans_mat')
 
     all = {}
     lastID = 0
@@ -72,6 +39,8 @@ class CCD():
         self.apcor_outer_radius    = None
         self.apcor_factor          = None
         self.apcor_uncertainty     = None
+        self.zeropoint             = None
+        self.trans_mat             = None
         CCD.all.update({self.uid:self})
 
     def compute_sky_background(self, verbose = False, prefix = ""):
@@ -127,7 +96,7 @@ class CCD():
             self.background_proportion = None
 
     def to_dict(self):
-        return {'id':self.id,
+        dict = {'id':self.id,
                 'background_average'   :self.background_average,
                 'background_median'    :self.background_median,
                 'background_std'       :self.background_std,
@@ -136,5 +105,14 @@ class CCD():
                 'apcor_inner_radius'   :self.apcor_inner_radius,
                 'apcor_outer_radius'   :self.apcor_outer_radius,
                 'apcor_factor'         :self.apcor_factor,
-                'apcor_uncertainty'    :self.apcor_uncertainty
+                'apcor_uncertainty'    :self.apcor_uncertainty,
+                'zeropoint'            :self.zeropoint,
+                'trans_a'              :self.trans_mat[0] if self.trans_mat is not None else None,
+                'trans_b'              :self.trans_mat[1] if self.trans_mat is not None else None,
+                'trans_c'              :self.trans_mat[2] if self.trans_mat is not None else None,
+                'trans_d'              :self.trans_mat[3] if self.trans_mat is not None else None,
+                'trans_e'              :self.trans_mat[4] if self.trans_mat is not None else None,
+                'trans_f'              :self.trans_mat[5] if self.trans_mat is not None else None
             }
+        # if self.trans_mat is not None: print(dict)
+        return dict
