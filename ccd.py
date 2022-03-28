@@ -1,8 +1,6 @@
 from numpy import *
 from utils.term import *
 
-mp_stop = False  
-
 #    _____ _____ _____  
 #   / ____/ ____|  __ \ 
 #  | |   | |    | |  | |
@@ -67,18 +65,12 @@ class CCD():
         self.background_std = s
         self.background_proportion = sum(img!=0) / (sizeX*sizeY)
  
-    def mp_compute_sky_backgroud(ccd, totalCCD=-1, verbose=False, prefix=""):
+    def mp_compute_sky_background(ccd, totalCCD=-1, verbose=False, prefix=""):
         """Allow to parrallelize the call of sky_backgroud()"""
-        global mp_stop
-        if mp_stop: return
-        try:
-            if verbose == 2: print(f"{prefix}Computing sky background of CCD {int(ccd.id)}...")
-            if verbose == True: progressbar(int(ccd.id) / (totalCCD-1), prefix=prefix)
-
-            ccd.compute_sky_background()
-
-            if verbose == 2: print(f"{prefix}Sky background of CCD {int(ccd.id)} computed.")
-        except KeyboardInterrupt: mp_stop = True
+        if verbose == 2: print(f"{prefix}Computing sky background of CCD {int(ccd.id)}...")
+        if verbose == True: progressbar(int(ccd.id) / (totalCCD-1), prefix=prefix)
+        ccd.compute_sky_background()
+        if verbose == 2: print(f"{prefix}Sky background of CCD {int(ccd.id)} computed.")
 
     def computeFWHM(self):
         pass # TODO

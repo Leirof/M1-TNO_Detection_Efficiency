@@ -7,51 +7,52 @@ import os
 from astropy.io import fits
 from numpy import *
 from utils.multithread import *
-from multiprocessing import Pool
 from ccd import *
 import time
 from utils.term import *
 import json
+import threading
 
 if __name__ == "__main__":
 
     interface.connectData(verbose=True)
 
     print("Treating Data...")
-    i=0
+    # i=0
     data = {}
-    for block in Block.all.values():
-        if i > 0: break
-        print(f"Block {block.id}")
-        for triplet in block.tripletList:
-            if i > 0: break
-            print(f"|  Triplet {triplet.id}")
-            for shot in triplet.shotList:
-                if i > 0: break
-                else: i+=1
-                print(f"|  |  Shot {shot.id}")
+    for j, block in enumerate(Block.all.values()):
+        # if i > 0: break
+        print(f"Block {block.id} ({j+1}/{len(Block.all.values())})")
+        for k,triplet in enumerate(block.tripletList):
+            # if i > 0: break
+            print(f"|  Triplet {triplet.id} ({k+1}/{len(block.tripletList)})")
+            for l, shot in enumerate(triplet.shotList):
+                # if i > 0: break
+                # else: i+=1
+                print(f"|  |  Shot {shot.id} ({l+1}/{len(triplet.shotList)})")
 
                 print("|  |  Loading shot...",end="\r")
                 interface.loadShot(shot)
 
                 #------ MonoThread
 
-                for ccd in shot.ccdList:
-                    #print(f"|  |  |   CCD {ccd.id}")
-                    progressbar(int(ccd.id)/(len(shot.ccdList)-1),prefix="|  |  ")
-                    ccd.compute_sky_background()
+                # for m, ccd in enumerate(shot.ccdList):
+
+                #     #print(f"|  |  |   CCD {ccd.id}")
+                #     progressbar(int(ccd.id)/(len(shot.ccdList)-1),prefix=f"|  |  Treating CCD {ccd.id} ({m+1}/{len(shot.ccdList)}) ")
+                #     ccd.compute_sky_background()
 
                 #------ Multithread
 
-                # args = []
-                # for ccd in shot.ccdList:
-                #     args.append((ccd, len(shot.ccdList), 2, "|  |  "))
-                    
-                # print("|  |  Computing...",end="\r")
-                # cores = min(len(shot.ccdList),CPUcount)
-                # print(len(args),cores)
-                # with Pool(cores) as p: ccds_background = p.starmap(CCD.mp_compute_sky_backgroud,args) # Computing all ccd's sky background and put hem in the good order
-                # shot.unload()
+                for m, ccd in enumerate(shot.ccdList):
+                    thread = threading.Thread(target=CCD.mp_compute_sky_background, args=(ccd, len(shot.ccdList), True, f"|  |  Treating CCD {ccd.id} ({m+1}/{len(shot.ccdList)}) "))
+                    thread.start()
+                                
+                for thread in threading.enumerate():
+                    try:
+                        thread.join()
+                        del thread
+                    except RuntimeError: pass
 
                 #------
 

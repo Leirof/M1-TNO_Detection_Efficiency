@@ -11,8 +11,9 @@ def progressbar(progress: float, prefix = "", stop:bool=False) -> None:
     currentProgress = int(progress*100)
     margin = len(prefix) + 8
     currentBar = int(min(progress*(term_size-margin),term_size-margin))
+    currentProgress = int(min(progress*(term_size-margin),100))
     if not (currentProgress == lastProgressPrinted and currentBar == lastBarPrinted):
-        if not stop and progress != 1: print(f"{prefix}[{'='*currentBar}{' '*(term_size-margin-currentBar)}] {currentProgress}%", end="\r")
-        else: print(f"{prefix}[{'='*currentBar}{' '*(term_size-margin-currentBar)}] {currentProgress}%")
+        if not stop and progress < 1: print(f"{prefix}[{'='*currentBar}{' '*(term_size-margin-currentBar)}] {currentProgress}%", end="\r")
+        else:print(f"{prefix}[{'='*currentBar}{' '*(term_size-margin-currentBar)}] {currentProgress}%")
     lastProgressPrinted = currentProgress
     lastBarPrinted = currentBar
