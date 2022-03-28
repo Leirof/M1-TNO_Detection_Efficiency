@@ -103,6 +103,8 @@ def loadShot(shot, verbose=False, prefix=""):
         for ccd in shot.ccdList:
             if i == int(ccd.id):
                 ccd.data = hdul[i+1].data
+    for ccd in shot.ccdList:
+        loadCCD(ccd)
     return shot
 
 def loadCCD(ccd):
@@ -114,18 +116,18 @@ def loadCCD(ccd):
             if i == int(ccd.id):
                 ccd.data = hdul[i].data
 
-    ccd.fwhm = loadtxt(os.path.join(ccd.dataPath,f"{ccd.uid}.fwhm"))
-
+    ccd.fwhm = float(loadtxt(os.path.join(ccd.dataPath,f"{ccd.uid}.fwhm")))
+    # print("fwhm:",ccd.fwhm,type(ccd.fwhm))
     apcor = loadtxt(os.path.join(ccd.dataPath,f"{ccd.uid}.apcor"))
-    ccd.apcor_inner_radius = apcor[0]
-    ccd.apcor_outer_radius = apcor[1]
-    ccd.apcor_factor       = apcor[2]
-    ccd.apcor_uncertainty  = apcor[3]
-    
-    apcor.zeropoint = loadtxt(os.path.join(ccd.dataPath,f"{ccd.uid}.zeropoint.used"))
-
+    ccd.apcor_inner_radius = float(apcor[0])
+    ccd.apcor_outer_radius = float(apcor[1])
+    ccd.apcor_factor       = float(apcor[2])
+    ccd.apcor_uncertainty  = float(apcor[3])
+    # print("apcor:", ccd.apcor_inner_radius, ccd.apcor_outer_radius, ccd.apcor_factor, ccd.apcor_uncertainty,type(ccd.apcor_inner_radius))
+    ccd.zeropoint = float(loadtxt(os.path.join(ccd.dataPath,f"{ccd.uid}.zeropoint.used")))
+    # print("zeropoint:",ccd.zeropoint,type(ccd.zeropoint))
     ccd.trans_mat = loadtxt(os.path.join(ccd.dataPath,f"{ccd.uid}.trans.jmp"))
-
+    # print("trans_mat:",ccd.trans_mat,type(ccd.trans_mat))
     return ccd
 
 #   _______        _     _____        _           _____                _     _                        
