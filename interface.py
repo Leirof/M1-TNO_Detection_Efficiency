@@ -155,18 +155,18 @@ if __name__ == "__main__":
     incomplet = []
 
     for ext in files_to_check:
-        os.remove(os.path.join(list_dest,ext+"_list.txt")) 
+        if os.path.isfile(os.path.join(list_dest,ext+"_list.txt")): os.remove(os.path.join(list_dest,ext+"_list.txt")) 
 
     for ccd in CCD.all.values():
         for i, ext in enumerate(files_to_check):
             if not os.path.isfile(os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.{ext}")):
-                if ext == "trans.jmp" and ccd not in incomplet: incomplet.append(ccd)
+                if ccd not in incomplet: incomplet.append(ccd)
                 with open(os.path.join(list_dest,ext+"_list.txt"),"a") as file: file.write(ccd.uid + "\n")
                 print(os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.{ext}"))
                 count[i] += 1
 
     for ccd in incomplet:
-        print(ccd.id)
+        print("Removed ccd",ccd.id)
         if not os.path.isdir(os.path.join(ccd_dest,ccd.shot.id)): os.makedirs(os.path.join(ccd_dest,ccd.shot.id))
         os.rename(ccd.dataPath, os.path.join(ccd_dest,ccd.shot.id,"ccd" + ccd.id))
         
