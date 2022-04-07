@@ -95,7 +95,8 @@ def loadTriplet(triplet):
 
 def loadShot(shot, verbose=False, prefix=""):
     """This function use the informations contained in the shot object to find the corresponding data and fill the missing parts"""
-    hdul = fits.open(os.path.join(shot.dataPath,f"{shot.id}p.fits.fz"))
+    try: hdul = fits.open(os.path.join(shot.dataPath,f"{shot.id}p.fits.fz"))
+    except FileNotFoundError: hdul = fits.open(os.path.join(shot.dataPath,f"{shot.id}p.fits"))
 
     if verbose: print(f"{prefix}Getting data for shot {shot.id}...")    
     for i in range(len(hdul)-1):
@@ -104,14 +105,19 @@ def loadShot(shot, verbose=False, prefix=""):
             if i == int(ccd.id):
                 ccd.data = hdul[i+1].data
     for ccd in shot.ccdList:
-        loadCCD(ccd)
+        try: loadCCD(ccd)
+        except TypeError as e:
+            print("CCD :",ccd.id)
+            raise e
+
     return shot
 
 def loadCCD(ccd):
     """This function use the informations contained in the CCD object to find the corresponding data and fill the missing parts"""
 
     if ccd.data is None:
-        hdul = fits.open(os.path.join(ccd.shot.dataPath,f"{ccd.shot.id}p.fits.fz"))
+        try: hdul = fits.open(os.path.join(ccd.shot.dataPath,f"{ccd.shot.id}p.fits.fz"))
+        except FileNotFoundError: hdul = fits.open(os.path.join(ccd.shot.dataPath,f"{ccd.shot.id}p.fits"))
         for i in range(len(hdul)-1):
             if i == int(ccd.id):
                 ccd.data = hdul[i].data

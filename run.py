@@ -21,6 +21,7 @@ if __name__ == "__main__":
     # i=0
     data = {}
     for j, block in enumerate(Block.all.values()):
+        #if j<6:continue
         # if i > 0: break
         print(f"Block {block.id} ({j+1}/{len(Block.all.values())})")
         for k,triplet in enumerate(block.tripletList):
@@ -44,20 +45,20 @@ if __name__ == "__main__":
 
                 #------ Multithread
 
-                for m, ccd in enumerate(shot.ccdList):
-                    thread = threading.Thread(target=CCD.mp_compute_sky_background, args=(ccd, len(shot.ccdList), True, f"|  |  Treating CCD {ccd.id} ({m+1}/{len(shot.ccdList)}) "))
-                    thread.start()
-                                
-                for thread in threading.enumerate():
-                    try:
-                        thread.join()
-                        del thread
-                    except RuntimeError: pass
+                m=0
+                while m < len(shot.ccdList):                            # Loop over the CCDs
+                    joinThreads()                                       # Wait for existing threads
+                    for _ in range(min(CPUcount,len(shot.ccdList)-m)):  # Associating a computation to a thread
+                        thread = threading.Thread(target=CCD.mp_compute_sky_background, args=(shot.ccdList[m], len(shot.ccdList), True, f"|  |  Treating CCD {shot.ccdList[m].id} ({m+1}/{len(shot.ccdList)}) "))
+                        thread.start()
+                        m+=1
+                joinThreads()
 
                 #------
+         
+                shot.unload() # Free memory space
 
-                
-                shot.unload()
+        data = {}
         data.update({f"block {block.id}":block.to_dict()})
-    with open(os.path.join(interface.OUTPUT,'data.json'), 'w') as fp:
-        json.dump(data, fp)
+        with open(os.path.join(interface.OUTPUT,f'{block.id}.json'), 'w') as fp:
+            json.dump(data, fp)
