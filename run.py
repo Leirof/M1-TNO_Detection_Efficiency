@@ -18,11 +18,9 @@ if __name__ == "__main__":
     interface.connectData(verbose=True)
 
     print("Treating Data...")
-    # i=0
     data = {}
     for j, block in enumerate(Block.all.values()):
-        #if j<6:continue
-        # if i > 0: break
+        if os.path.isfile(os.path.join(interface.OUTPUT,f"{block.id}.json")): continue
         print(f"Block {block.id} ({j+1}/{len(Block.all.values())})")
         for k,triplet in enumerate(block.tripletList):
             # if i > 0: break
@@ -58,7 +56,7 @@ if __name__ == "__main__":
          
                 shot.unload() # Free memory space
 
-        data = {}
-        data.update({f"block {block.id}":block.to_dict()})
+                
+                shot.unload()
         with open(os.path.join(interface.OUTPUT,f'{block.id}.json'), 'w') as fp:
-            json.dump(data, fp)
+            json.dump({f"block {block.id}":block.to_dict()}, fp)
