@@ -12,7 +12,7 @@ All the data cannot be stored entirely in the RAM, so each object will load data
 ##################################################
 DATA_ROOT = "D:/Lab_Project/OSSOS/dbimages/Triplets"
 DATA_LIST = "rsrc/All_triplets"
-OUTPUT = "./results/"
+OUTPUT = "D:/Lab_Project/results/"
 ##################################################
 
 from block import Block
@@ -155,10 +155,13 @@ if __name__ == "__main__":
         "trans.jmp"
     ]
     list_dest = "D:/Lab_Project/incomplet/" # destination of the lists of incompelte ccds
-    ccd_dest = "D:/Lab_Project/incomplet/missing_trans_mat/" # new location for incomplet ccd
+    ccd_dest = "D:/Lab_Project/incomplet/ccds/" # new location for incomplet ccd
+    ccd_dest2 = "D:/Lab_Project/incomplet/blockH/" # new location for incomplet ccd
 
     count = zeros(len(files_to_check))
     incomplet = []
+    incomplet_triplet = []
+    incomplet_block = []
 
     for ext in files_to_check:
         if os.path.isfile(os.path.join(list_dest,ext+"_list.txt")): os.remove(os.path.join(list_dest,ext+"_list.txt")) 
@@ -167,17 +170,25 @@ if __name__ == "__main__":
         for i, ext in enumerate(files_to_check):
             if not os.path.isfile(os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.{ext}")):
                 if ccd not in incomplet: incomplet.append(ccd)
+                if ccd.triplet not in incomplet_triplet: incomplet_triplet.append(ccd.triplet)
+                if ccd.block not in incomplet_block: incomplet_block.append(ccd.block)
                 with open(os.path.join(list_dest,ext+"_list.txt"),"a") as file: file.write(ccd.uid + "\n")
-                print(os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.{ext}"))
+                print(f"{ccd.triplet.id}" + os.path.join(ccd.dataPath,f"{ccd.shot.id}p{ccd.id}.{ext}"))
                 count[i] += 1
 
     for ccd in incomplet:
         print("Removed ccd",ccd.id)
-        if not os.path.isdir(os.path.join(ccd_dest,ccd.shot.id)): os.makedirs(os.path.join(ccd_dest,ccd.shot.id))
-        os.rename(ccd.dataPath, os.path.join(ccd_dest,ccd.shot.id,"ccd" + ccd.id))
+        if ccd.block.id == "14BH":
+            print(f"H : {ccd.block.id}")
+            if not os.path.isdir(os.path.join(ccd_dest2,ccd.shot.id)): os.makedirs(os.path.join(ccd_dest2,ccd.shot.id))
+            os.rename(ccd.dataPath, os.path.join(ccd_dest2,ccd.shot.id,"ccd" + ccd.id))
+        else:
+            print(f"NOT H : {ccd.block.id}")
+            if not os.path.isdir(os.path.join(ccd_dest,ccd.shot.id)): os.makedirs(os.path.join(ccd_dest,ccd.shot.id))
+            os.rename(ccd.dataPath, os.path.join(ccd_dest,ccd.shot.id,"ccd" + ccd.id))
         
 
-    for i, ext in enumerate(files_to_check):
-        print(f"Found {count[i]} CCDs with no '{ext}' file.")
+    # for i, ext in enumerate(files_to_check):
+    #     print(f"Found {count[i]} incomplet CCDs in {len(incomplet_triplet)} triplets in {len(incomplet_block)}")
     
-    print(f"A total of {len(incomplet)} CCDs are incomplet.")
+    print(f"Found {count[i]} incomplet CCDs in {len(incomplet_triplet)} triplets in {len(incomplet_block)} blocks")
