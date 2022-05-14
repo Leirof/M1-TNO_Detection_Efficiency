@@ -5,17 +5,51 @@ This script is used to get the detection rate model parameters from the experime
 INPUT = "D:\Lab_Project\Fake_Objects_Data"
 
 import os
-import numpy as np
+from numpy import *
 import re
 import interface
+import matplotlib.pyplot as plt
+import scipy.optimize as optimize
 
 from block import Block
 from triplet import Triplet
 from shot import Shot
 from ccd import CCD
 
+def ft(m,a,b,c,d):
+    return  1/4 * a * (1-tanh((m-b)/c)) * (1-tanh((m-b)/d))
+
+def fs(m,a,b,c,d):
+    return  (a-b*(m-21)**2) / (1+exp((m-c)/d))
 
 
+data = loadtxt("D:/Lab_Project/Fake_Objects_Data/2013A/Eblock/sL2_fk_E.0.50-8.00-0.2.mag-rate.eff")
+
+mag = data[:,0]
+eff = data[:,1]
+paramft = [1,21,10,1]
+paramfs = [25,-1,25,2]
+
+paramft = optimize.curve_fit(ft, mag, eff, paramft)[0]
+paramfs = optimize.curve_fit(ft, mag, eff, paramfs)[0]
+
+print(paramft)
+print(paramfs)
+
+plt.subplot(121)
+plt.plot(mag,eff,"x",label="Experimental")
+plt.plot(mag,ft(mag,*paramft),label="FT")
+plt.legend()
+plt.grid()
+plt.subplot(122)
+plt.plot(mag,eff,"x",label="Experimental")
+plt.plot(mag,fs(mag,*paramfs),label="FS")
+plt.legend()
+plt.grid()
+plt.show()
+
+
+'''
 tmpFile = -1
 def unpack(file_name):
     """
@@ -35,51 +69,6 @@ def unpack(file_name):
             tmp.write(line)
         tmp.close()
 
-"""
-    print(file_name)
-    regex1 = re.compile('#fk([0-9]*)s([0-9]*).*')
-    regex2 = re.compile('#V ([0-9][0-9][0-9][0-9][0-9][0-9][0-9]).*')
-
-    if not os.path.isdir("tmp"): os.mkdir("tmp")
-
-    dict = {}
-    data = []
-    oldShots = []
-    for line in open(file_name):
-        if line.startswith("# "): continue
-
-        # Case 1
-        if line.startswith("#fk"):
-            shot, ccd = regex1.search(line).groups()
-            shots = [shot]
-            ccd = int(ccd)
-            print("Case 1 ----------")
-            print(shot, ccd)
-
-        # Case 2
-        if line.startswith("#K EXPNUM"):
-            shots = []
-            ccd = 0
-            print("Case 2 ----------")
-        if regex2.match(line):
-            shots.append(regex2.search(line).groups()[0])
-            if len(shots) == 3:
-                if shots == oldShots: ccd += 1
-                else: ccd = 0
-                oldShots = shots
-                print(shots,ccd)
-
-        # Values
-        if not line.startswith("#"):
-            for shot in shots:
-                if not os.path.isdir(f"tmp/{shot}"): os.mkdir(f"tmp/{shot}")
-                if ccd < 10: sccd = f"0{ccd}"
-                else: sccd = str(ccd)
-                with open(f"tmp/{shot}/{sccd}.npy","a") as f:
-                    f.write(line)
-    return data
-"""
-
 if __name__ == "__main__":
     # interface.connectData(verbose=True)
     for root, dir, files in os.walk(INPUT):
@@ -87,3 +76,5 @@ if __name__ == "__main__":
             if  file[-12:] == ".reals.match":
                 unpack(os.path.join(root, file))
                 #print(data)
+
+'''
