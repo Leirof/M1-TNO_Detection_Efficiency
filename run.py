@@ -10,7 +10,7 @@ from utils.multithread import *
 from ccd import *
 import time
 from utils.term import *
-import json
+import yaml
 import threading
 
 if __name__ == "__main__":
@@ -20,7 +20,7 @@ if __name__ == "__main__":
     print("Treating Data...")
     data = {}
     for j, block in enumerate(Block.all.values()):
-        if os.path.isfile(os.path.join(interface.OUTPUT,f"{block.id}.json")): continue
+        if os.path.isfile(os.path.join(interface.OUTPUT,f"{block.id}.yml")): continue
         print(f"Block {block.id} ({j+1}/{len(Block.all.values())})")
         for k,triplet in enumerate(block.tripletList):
             # if i > 0: break
@@ -59,4 +59,4 @@ if __name__ == "__main__":
                 
                 shot.unload()
         with open(os.path.join(interface.OUTPUT,f'{block.id}.json'), 'w') as fp:
-            json.dump({f"block {block.id}":block.to_dict()}, fp)
+            yaml.dump({f"block {block.id}":block.to_dict()}, fp)

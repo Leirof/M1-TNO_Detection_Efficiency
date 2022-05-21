@@ -1,0 +1,9 @@
+Rate:
+  min: 2.0 # minimum velocity (arcsec/h)
+  max: 5.0 # maximum velocity (arcsec/h)
+  square:
+    a: 0.926963389
+    b: 1.31419227E-02
+    c: 24.7708035
+    d: 0.178037807
+    goodness: 1.311 # (reduced chi^2)
