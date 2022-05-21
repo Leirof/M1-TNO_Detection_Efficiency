@@ -23,15 +23,15 @@ def fs(m,a,b,c,d):
     return  (a-b*(m-21)**2) / (1+exp((m-c)/d))
 
 
-data = loadtxt("D:/Lab_Project/Fake_Objects_Data/2013A/Eblock/sL2_fk_E.0.50-8.00-0.2.mag-rate.eff")
+data = loadtxt("D:/Lab_Project/Fake_Objects_Data/2013A/Oblock/sL2_fk_O.0.50-7.00-0.2.mag-rate.eff")
 
 mag = data[:,0]
 eff = data[:,1]
 paramft = [1,21,10,1]
-paramfs = [25,-1,25,2]
+paramfs = [25,0,25,3]
 
 paramft = optimize.curve_fit(ft, mag, eff, paramft)[0]
-paramfs = optimize.curve_fit(ft, mag, eff, paramfs)[0]
+paramfs = optimize.curve_fit(fs, mag, eff, paramfs, maxfev=100000)[0]
 
 print(paramft)
 print(paramfs)
