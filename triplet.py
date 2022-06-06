@@ -1,4 +1,4 @@
-
+from block import Block
 class Triplet():
     __slots__ = ('id','shotList','block','dataPath')
 
@@ -8,6 +8,7 @@ class Triplet():
         self.id = id
         self.shotList = [] if shotList is None else shotList
         self.block = block
+        block.tripletList.append(self)
         self.dataPath = dataPath
         if id in Triplet.all: raise ValueError("A triplet with this ID already exist")
         Triplet.all.update({self.id:self})

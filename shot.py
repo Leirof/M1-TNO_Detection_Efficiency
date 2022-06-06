@@ -1,4 +1,4 @@
-
+from triplet import Triplet
 class Shot():
     __slots__ = ('id','ccdList','triplet','block','dataPath')
 
@@ -8,6 +8,7 @@ class Shot():
         self.id = id
         self.ccdList = [] if ccdList is None else ccdList
         self.triplet = triplet
+        triplet.shotList.append(self)
         self.block = block
         self.dataPath = dataPath
         if id in Shot.all: raise ValueError("A shot with this ID already exist")

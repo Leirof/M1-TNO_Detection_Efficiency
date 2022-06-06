@@ -1,5 +1,6 @@
 from numpy import *
 from utils.term import *
+from shot import Shot
 
 #    _____ _____ _____  
 #   / ____/ ____|  __ \ 
@@ -24,6 +25,7 @@ class CCD():
         self.id                    = id
         self.data                  = data
         self.shot                  = shot
+        shot.ccdList.append(self)
         self.triplet               = triplet
         self.block                 = block
         self.dataPath              = dataPath
