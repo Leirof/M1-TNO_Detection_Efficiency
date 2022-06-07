@@ -1,5 +1,5 @@
-block 15AM:
-  id: 15AM
+block 2015AM:
+  id: 2015AM
   rates:
     rate_2.0-6.0:
       min: 2.0 # minimum velocity (arcsec/h)

@@ -1,5 +1,5 @@
-block 15BD:
-  id: 15BD
+block 2015BD:
+  id: 2015BD
   rates:
     rate_2.0-6.0:
       min: 2.0 # minimum velocity (arcsec/h)

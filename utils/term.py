@@ -1,5 +1,9 @@
 import os
-term_size = os.get_terminal_size().columns
+
+# term_size = os.get_terminal_size()
+# term_size = term_size.columns
+
+term_size = 80
 
 lastProgressPrinted : int = -1
 lastBarPrinted : int = -1

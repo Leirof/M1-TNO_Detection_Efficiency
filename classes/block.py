@@ -12,7 +12,7 @@ class Block():
         self.dataPath       :str            = dataPath
 
         if id in Block.all:
-            raise ValueError("A block with this ID already exist")
+            raise ValueError(f"A block with the ID {id} already exist")
         else:
             Block.all.update({self.id:self})
 
@@ -29,7 +29,7 @@ class Block():
             r.update({f"rate_{round(rate.min_vel,1)}-{round(rate.max_vel,1)}":rate.to_dict()})
         return {'id':self.id,'rates':r,'tripletList':t}
 
-    def to_ai_ready(self, func, vel, maxTriplet, maxCCD, randomTriplet = True, randomCCD = True):
+    def to_ai_ready(self, func = None, vel = 4.5, maxTriplet = 8, maxCCD = 36, randomTriplet = True, randomCCD = True):
         block_data = []
         already_selected = []
         rate_data = None
@@ -48,9 +48,10 @@ class Block():
 
         # Check if the desired detection rate was already measured for this block
         for rate in self.rates:
-            if rate.min_vel <= vel and vel <= rate.max_vel and rate.func == func:
-                rate_data = rate.to_ai_ready()
-                break
+            if rate.min_vel <= vel and vel <= rate.max_vel:
+                if func is None or rate.func == func:
+                    rate_data = rate.to_ai_ready()
+                    break
 
         if rate_data is None:
             print(self.id)

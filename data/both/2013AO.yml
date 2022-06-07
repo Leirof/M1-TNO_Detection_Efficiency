@@ -1,5 +1,5 @@
-block O:
-  id: O
+block 2013AO:
+  id: 2013AO
   rates:
     rate_0.5-7.0:
       min: 0.5 # minimum velocity (arcsec/h)

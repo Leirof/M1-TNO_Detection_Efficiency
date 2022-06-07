@@ -1,5 +1,5 @@
-block E:
-  id: E
+block 2013AE:
+  id: 2013AE
   rates:
     rate_0.5-8.0:
       min: 0.5 # minimum velocity (arcsec/h)

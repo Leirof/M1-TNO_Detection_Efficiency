@@ -1,5 +1,5 @@
-block 13BL:
-  id: 13BL
+block 2013BL:
+  id: 2013BL
   rates:
     rate_2.5-8.0:
       min: 2.5 # minimum velocity (arcsec/h)
