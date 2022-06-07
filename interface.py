@@ -15,10 +15,10 @@ DATA_LIST = "rsrc/All_triplets"
 OUTPUT = "D:/Lab_Project/results/"
 ##################################################
 
-from block import Block
-from triplet import Triplet
-from shot import Shot
-from ccd import CCD
+from classes.block import Block
+from classes.triplet import Triplet
+from classes.shot import Shot
+from classes.ccd import CCD
 import os
 from astropy.io import fits
 from numpy import *
@@ -39,10 +39,11 @@ def connectData(verbose=False):
 
     # Reading All_triplets file
     with open(DATA_LIST) as file:
-        if verbose == True: print("Scanning data...",end="\r")
-        if verbose == 2: print("Scanning data...")
-        for line in file:
 
+        if verbose == True: print("Scanning data...",end="\r")
+        if verbose == 2:    print("Scanning data...")
+
+        for line in file:
             if line == "\n":
                 continue
 
@@ -50,13 +51,17 @@ def connectData(verbose=False):
             # Reading headers (blocks and triplets)
 
             if "#" in line:
+
                 if line[1:-5] not in Block.all:
                     currentBlock = Block(id=line[1:-5])
+
                     if verbose == 2: print(f"   Block {line[1:-5]}")
+
                 else: currentBlock = Block.all[line[1:-5]] # Just to be sure to have the correct block
 
                 currentTriplet = Triplet(id=line[1:-1], block=currentBlock)
                 currentBlock.tripletList.append(currentTriplet)
+
                 if verbose == 2: print(f"      Triplet {line[1:-1]}")
             
             # __________________________________________________
@@ -64,11 +69,15 @@ def connectData(verbose=False):
 
             else:
                 currentShot = Shot(id=line[:-1].replace(" ",""),triplet=currentTriplet,block=currentBlock, dataPath=os.path.join(DATA_ROOT,str(int(line[:-1]))))
+
                 for i in os.listdir(currentShot.dataPath):
                     path = os.path.join(currentShot.dataPath,i)
+
                     if os.path.isdir(path) and i[:3] == "ccd":
                         currentShot.ccdList.append(CCD(id=i[3:], dataPath=path, shot=currentShot, triplet=currentShot.triplet, block=currentShot.block))
+
                 currentTriplet.shotList.append(currentShot)
+
                 if verbose == 2: print(f"         Shot {line[:-1]} with {len(currentShot.ccdList)} CCDs")
     
     if verbose == True: print("Scanning data... Done")

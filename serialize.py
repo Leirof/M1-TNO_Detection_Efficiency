@@ -1,13 +1,12 @@
 import interface
-from block import Block
-from triplet import Triplet
-from shot import Shot
-from ccd import CCD
+from classes.block import Block
+from classes.triplet import Triplet
+from classes.shot import Shot
+from classes.ccd import *
 import os
 from astropy.io import fits
 from numpy import *
 from utils.multithread import *
-from ccd import *
 import time
 from utils.term import *
 import yaml
