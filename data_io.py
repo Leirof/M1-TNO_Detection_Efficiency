@@ -77,11 +77,17 @@ def loadAll(path = "./data"):
     for folder in os.listdir(path):
         if os.path.isdir(f"./data/{folder}"):
             for file in os.listdir(f"./data/{folder}"):
-                print(f"Loading {file}")
                 if file.endswith(".yaml") or file.endswith(".yml") or file.endswith(".json"):
-                    loadSerialized(f"./data/{folder}/{file}")
+                    if file.split('.')[0] in Block.all: print(f"Block {file.split('.')[0]} is already loaded.")
+                    else:
+                        print(f"Loading {file}")
+                        loadSerialized(f"./data/{folder}/{file}")
 
-def get_ai_ready(func = "tan", vel = 4.5, maxTriplet = 8, maxCCD = 36, randomTriplet = True, randomCCD = True, subsets_per_block=1):
+def get_ai_ready(useExisting = True, func = "tan", vel = 4.5, maxTriplet = 8, maxCCD = 36, randomTriplet = True, randomCCD = True, subsets_per_block=1):
+    # if useExisting:
+    #     try:    return load("data/ai_ready.npz")["data"]
+    #     except: print("No data already available")
+    loadAll()
     data = []
     for _, block in Block.all.items():
         i = 0
@@ -93,7 +99,12 @@ def get_ai_ready(func = "tan", vel = 4.5, maxTriplet = 8, maxCCD = 36, randomTri
             #     continue
             data.append(block_data)
             i+=1
-    return array(data)
+    
+    data = array(data)
+    savez_compressed("data/ai_ready", data = data)
+    return data
+
+
 
 def save(file, bock = None):
     pass

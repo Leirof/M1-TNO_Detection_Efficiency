@@ -54,7 +54,6 @@ class Block():
                     break
 
         if rate_data is None:
-            print(self.id)
             return None
         else:
             return concatenate((block_data,rate_data))
