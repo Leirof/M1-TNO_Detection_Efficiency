@@ -1,221 +1,131 @@
-# %% [markdown]
-# ## Step 1 - Import and init
-# 
-# You can also adjust the verbosity by changing the value of TF_CPP_MIN_LOG_LEVEL :
-# - 0 = all messages are logged (default)
-# - 1 = INFO messages are not printed.
-# - 2 = INFO and WARNING messages are not printed.
-# - 3 = INFO , WARNING and ERROR messages are not printed.
 
-# %%
-# import os
-# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+print("⌛ Loading libs...")
 
-from IPython.display import display
-
-import tensorflow as tf
-from tensorflow import keras
-
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
 import os,sys
-
-# sys.path.append('..')
-# import fidle.pwk as pwk
-
 import data_io
-from classes.block import Block
-from classes.triplet import Triplet
-from classes.shot import Shot
-from classes.ccd import CCD
+import numpy             as np
+import matplotlib.pyplot as plt
+import pandas            as pd
+import tensorflow        as tf
+from   IPython.display   import display
+from   tensorflow        import keras
+from   classes.block     import Block
+from   classes.triplet   import Triplet
+from   classes.shot      import Shot
+from   classes.ccd       import CCD
 
-# datasets_dir = pwk.init('BHPD1')
+print("🧮 Collecting dataset...")
 
-# %% [markdown]
-# Verbosity during training : 
-# - 0 = silent
-# - 1 = progress bar
-# - 2 = one line per epoch
+data = data_io.get_ai_ready(func="tan",subsets_per_block=500)
 
-# %%
-fit_verbosity = 1
+# Normalization
+mean = data[:,:-4].mean()
+std  = data[:,:-4].std()
+data[:,:-4] = (data[:,:-4] - mean) / std
 
-# %% [markdown]
-# ## Step 2 - Retrieve data
+n = 100 # number of loops
+model = None
+for i in range(n):
+  print(f"🔁 Loop {i+1}/{n}")
 
-# %%
-data = data_io.get_ai_ready(func="tan",subsets_per_block=10000)
+  print("🔀 Dataset shuffling...")
 
-# %% [markdown]
-# ## Step 3 - Preparing the data
-# ### 3.1 - Split data
-# We will use 70% of the data for training and 30% for validation.  
-# The dataset is **shuffled** and shared between **learning** and **testing**.  
-# x will be input data and y the expected output
+  np.random.shuffle(data)
 
-# %%
-# ---- Shuffle and Split => train, test
-#
+  print("🗃️ Creating folds...")
 
-train_prop = 0.7
+  K=5
+  folds = []
+  for j in range(K):
+    folds.append(data[j::K])
 
-train_sets = int(len(data)*train_prop)
+  print("📊 Splitting data for training and test...")
 
-index = np.zeros(len(data),dtype=bool)
-index[:train_sets] = True
-np.random.shuffle(index)
+  x_train = []; y_train = []; x_test = []; y_test = []
+  for j, fold in enumerate(folds):
+    train_prop = 0.7
+    train_sets = int(len(fold)*train_prop)
+    index = np.zeros(len(fold),dtype=bool)
+    index[:train_sets] = True
+    np.random.shuffle(index)
 
-data_train = data[index]
-data_test  = data[~index]
+    data_train = fold[index]
+    data_test  = fold[~index]
 
-x_train = data_train[:,:-4]
-y_train = data_train[:,-4:]
-x_test  = data_test[:,:-4]
-y_test  = data_test[:,-4:]
-
-print('Original data shape was : ',data.shape)
-print('x_train : ',x_train.shape, 'y_train : ',y_train.shape)
-print('x_test  : ',x_test.shape,  'y_test  : ',y_test.shape)
-
-# %% [markdown]
-# ### 3.2 - Data normalization
-# **Note :** 
-#  - All input data must be normalized, train and test.  
-#  - To do this we will **subtract the mean** and **divide by the standard deviation**.  
-#  - But test data should not be used in any way, even for normalization.  
-#  - The mean and the standard deviation will therefore only be calculated with the train data.
-
-# %%
-# display(x_train.describe().style.format("{0:.2f}").set_caption("Before normalization :"))
-
-mean = x_train.mean()
-std  = x_train.std()
-x_train = (x_train - mean) / std
-x_test  = (x_test  - mean) / std
-
-# display(x_train.describe().style.format("{0:.2f}").set_caption("After normalization :"))
-# display(x_train.head(5).style.format("{0:.2f}").set_caption("Few lines of the dataset :"))
-
-x_train, y_train = np.array(x_train), np.array(y_train)
-x_test,  y_test  = np.array(x_test),  np.array(y_test)
-
-
-# %% [markdown]
-# ## Step 4 - Build a model
-# About informations about : 
-#  - [Optimizer](https://www.tensorflow.org/api_docs/python/tf/keras/optimizers)
-#  - [Activation](https://www.tensorflow.org/api_docs/python/tf/keras/activations)
-#  - [Loss](https://www.tensorflow.org/api_docs/python/tf/keras/losses)
-#  - [Metrics](https://www.tensorflow.org/api_docs/python/tf/keras/metrics)
-
-# %%
-def get_model_v1(shape):
+    x_train.append(data_train[:,:-4])
+    y_train.append(data_train[:,-4:])
+    x_test.append(data_test [:,:-4])
+    y_test.append(data_test [:,-4:])
   
-  model = keras.models.Sequential()
-  model.add(keras.layers.Input(shape, name="InputLayer"))
-  model.add(keras.layers.Dense(64, activation='relu', name='Dense_n1'))
-  model.add(keras.layers.Dense(64, activation='relu', name='Dense_n2'))
-  model.add(keras.layers.Dense(64, activation='relu', name='Dense_n3'))
-  model.add(keras.layers.Dense(4, name='Output'))
+  x_train = np.array(x_train); y_train = np.array(y_train); x_test = np.array(x_test); y_test = np.array(y_test)
   
-  model.compile(optimizer = 'adam',
-                loss      = 'mse',
-                metrics   = ['mae', 'mse'] )
-  return model
+  print("🧬 Creating model...")
+    
+  def get_model(x_train):
+    model = keras.models.Sequential()
+    model.add(keras.layers.Input((len(x_train[0]),), name="InputLayer"))
+    model.add(keras.layers.Dense(64, activation='relu', name='Dense_n1'))
+    model.add(keras.layers.Dense(64, activation='relu', name='Dense_n2'))
+    model.add(keras.layers.Dense(64, activation='relu', name='Dense_n3'))
+    model.add(keras.layers.Dense(4, name='Output'))
+    model.compile(optimizer = 'adam', loss = 'mse', metrics = ['accuracy'])#['mae', 'mse'] )
+    return model
 
-# %% [markdown]
-# ## Step 5 - Train the model
-# ### 5.1 - Get it
+  models = []; history = []; scores = []
+  for j in range(K):
+    X = np.concatenate(x_train[np.arange(len(x_train))!=j])
+    Y = np.concatenate(y_train[np.arange(len(y_train))!=j])
 
-# %%
-model=get_model_v1( (len(x_train[0]),) )
+    if model is None: models.append(get_model(X))
+    else: models.append(model)
 
-model.summary()
+    print(f"🏃‍♀️ Training AI with fold {j} as test...")
 
-# img=keras.utils.plot_model( model, to_file='./run/model.png', show_shapes=True, show_layer_names=True, dpi=96)
-# display(img)
+    history.append(models[j].fit(X, Y, epochs = 60, batch_size = 10, verbose = 0, validation_data = (x_test[j], y_test[j])))
 
-# %% [markdown]
-# ### 5.2 - Train it
+    # print("👀 Evaluation...")
 
-# %%
-history = model.fit(x_train,
-                    y_train,
-                    epochs          = 60,
-                    batch_size      = 10,
-                    verbose         = fit_verbosity,
-                    validation_data = (x_test, y_test))
+    scores.append(models[j].evaluate(x_test[j], y_test[j], verbose=0))
+    print(f"Score of this training: {scores[j][0]}")
 
-# %% [markdown]
-# ## Step 6 - Evaluate
-# ### 6.1 - Model evaluation
-# MAE =  Mean Absolute Error (between the labels and predictions)  
-# A mae equal to 3 represents an average error in prediction of $3k.
+  maxScore = scores[0][0]
+  model = models[0]
+  for j,s in enumerate(scores):
+    if s[0] > maxScore:
+      maxScore = s[0]
+      model = models[j]
 
-# %%
-score = model.evaluate(x_test, y_test, verbose=0)
+  print("🔮 Prediction...")
+  
+  new_data = Block.all["2015BD"].to_ai_ready(func="square")
 
-print('x_test / loss      : {:5.4f}'.format(score[0]))
-print('x_test / mae       : {:5.4f}'.format(score[1]))
-print('x_test / mse       : {:5.4f}'.format(score[2]))
+  new_x = new_data[:-4]
+  new_y = new_data[-4:]
 
-# %% [markdown]
-# ### 6.2 - Training history
-# What was the best result during our training ?
+  new_x = (new_x - mean) / std
 
-# %%
-df=pd.DataFrame(data=history.history)
-# display(df)
+  new_x=np.array(new_x).reshape(1,len(new_x))
 
-# %%
-print("min( val_mae ) : {:.4f}".format( min(history.history["val_mae"]) ) )
+  predictions = model.predict(new_x)
+  print(predictions)
 
-plt.plot(np.arange(len(history.history["val_mae"])),history.history["val_mae"],label="mae")
-plt.plot(np.arange(len(history.history["val_mae"])),history.history["val_mse"],label="mse")
-plt.plot(np.arange(len(history.history["val_mae"])),history.history["val_loss"],label="loss")
-plt.title("Evolution of mae value")
-plt.xlabel("Epoch")
-plt.ylabel("Mae")
-plt.grid()
-plt.legend()
+  def ft(m,a,b,c,d):
+      return a/4 * (1-np.tanh((m-b)/c)) * (1-np.tanh((m-b)/d))
+
+  def fs(m,a,b,c,d):
+      return (a-b*(m-21)**2) / (1+np.exp((m-c)/d))
+
+  m = np.linspace(21,25.5,1000)
+
+  plt.subplot(int(np.ceil(np.sqrt(n))),int(np.ceil(np.sqrt(n))),i+1)
+  plt.plot(m,ft(m,*predictions[0]), label="Machine Learning")
+  plt.plot(m,fs(m,new_y[0],new_y[1],new_y[2],new_y[3]), label="Excpected")
+  if i == 0: plt.title("TNO efficiency rate")
+  if i+1>n-np.ceil(np.sqrt(n)):    plt.xlabel("Magnitude")
+  if i%np.ceil(np.sqrt(n))==0: plt.ylabel("Efficiency")
+  plt.grid()
+  if i==0: plt.legend()
+
+plt.save("tno_efficiency_rate.png")
+model.save("model.ckpt")
 plt.show()
-
-# %%
-# pwk.plot_history(history, plot={'MSE' :['mse', 'val_mse'],
-#                                 'MAE' :['mae', 'val_mae'],
-#                                 'LOSS':['loss','val_loss']}, save_as='01-history')
-
-# %% [markdown]
-# ## Step 7 - Make a prediction
-# The data must be normalized with the parameters (mean, std) previously used.
-
-# %%
-new_data = Block.all["2015BD"].to_ai_ready()[:-4]
-
-new_data = (new_data - mean) / std
-
-new_data=np.array(new_data).reshape(1,len(new_data))
-
-# %%
-
-predictions = model.predict( new_data )
-print(predictions)
-
-def ft(m,a,b,c,d):
-    return a/4 * (1-np.tanh((m-b)/c)) * (1-np.tanh((m-b)/d))
-
-def fs(m,a,b,c,d):
-    return (a-b*(m-21)**2) / (1+np.exp((m-c)/d))
-
-m = np.linspace(21,25.5,1000)
-plt.plot(m,ft(m,*predictions[0]), label="Machine Learning")
-plt.plot(m,fs(m,0.930487275,9.34686325E-03,25.1766472,0.171281680), label="Excpected")
-plt.grid()
-plt.legend()
-plt.title("TNO efficiency rate")
-plt.xlabel("Magnitude")
-plt.ylabel("Efficiency")
-plt.show()
-
-
