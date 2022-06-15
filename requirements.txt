@@ -3,4 +3,4 @@ astropy
 turtle
 numpy
 matplotlib
-sphinx
+tensorflow
