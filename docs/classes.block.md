@@ -1,18 +1,18 @@
 # `classes.block.Block`
 
-### Class attributes
+## Class attributes
 
 - `all`: dictionnary containing blocks id as key and the instance of the blocs as values.
 
 ---
 
-### Class methods
+## Class methods
 
 No methods in this class
 
 ---
 
-### Object attributes
+## Object attributes
 
 - `id : str`: unique name of the block (ex: `2013AE`).
 - `tripletList : list[Triplet]` (optional): list of `Triplet` objects associated to this block.
@@ -21,9 +21,9 @@ No methods in this class
 
 ---
 
-### Object methods
+## Object methods
 
-#### `unload(self)`
+### `unload(self)`
 
 Delete the object and all associated triplets to clear memory.
 
@@ -32,7 +32,7 @@ Delete the object and all associated triplets to clear memory.
 
 **Returns**: None
 
-#### `to_dict(self)`
+### `to_dict(self)`
 
 Return a dictionary containing all the object informations. Useful to save it in a JSON or YAML format.
 
@@ -42,7 +42,7 @@ Return a dictionary containing all the object informations. Useful to save it in
 **Returns**:
 - `dict`: The containing all the object informations
 
-#### `to_ai_ready(self)`
+### `to_ai_ready(self)`
 
 Return a vector that can be used to train the AI.
 
