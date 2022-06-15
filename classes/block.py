@@ -1,6 +1,6 @@
 from numpy import *
 
-class Block():
+class Block(): 
     __slots__ = ('id','tripletList','dataPath', 'rates')
     
     all = {}

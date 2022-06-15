@@ -3,3 +3,4 @@ astropy
 turtle
 numpy
 matplotlib
+sphinx

@@ -9,7 +9,7 @@ from numpy import *
 from utils.multithread import *
 import time
 from utils.term import *
-import yaml
+import json
 import threading
 
 if __name__ == "__main__":
@@ -58,4 +58,4 @@ if __name__ == "__main__":
                 
                 shot.unload()
         with open(os.path.join(interface.OUTPUT,f'{block.id}.json'), 'w') as fp:
-            yaml.dump({f"block {block.id}":block.to_dict()}, fp)
+            json.dump({f"block {block.id}":block.to_dict()}, fp)

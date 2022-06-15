@@ -2,3 +2,6 @@ __pycache__/
 .vscode/
 results/
 model.ckpt/
+_build/
+_static/
+_templates/

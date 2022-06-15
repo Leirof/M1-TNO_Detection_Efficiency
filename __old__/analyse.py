@@ -5,8 +5,8 @@ from utils import *
 from multiprocessing import Pool
 
 ##################################
-input_path = 'D:/Lab Project/OSSOS/dbimages/Triplets'
-save_results_in = "E:/test/"
+input_path = 'H:/Lab_Project/OSSOS/dbimages/Triplets'
+save_results_in = "./results/"
 ##################################
 
 if __name__ == '__main__':
