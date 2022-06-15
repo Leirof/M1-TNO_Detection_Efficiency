@@ -87,7 +87,6 @@ def get_ai_ready(useExisting = True, func = "tan", vel = 4.5, maxTriplet = 8, ma
     # if useExisting:
     #     try:    return load("data/ai_ready.npz")["data"]
     #     except: print("No data already available")
-    loadAll()
     data = []
     for _, block in Block.all.items():
         i = 0
@@ -101,7 +100,7 @@ def get_ai_ready(useExisting = True, func = "tan", vel = 4.5, maxTriplet = 8, ma
             i+=1
     
     data = array(data)
-    savez_compressed("data/ai_ready", data = data)
+    # savez_compressed("data/ai_ready", data = data)
     return data
 
 
