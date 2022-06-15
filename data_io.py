@@ -104,6 +104,26 @@ def get_ai_ready(useExisting = True, func = "tan", vel = 4.5, maxTriplet = 8, ma
     return data
 
 
+def yaml_to_json():
+    for path, dirs, files in os.walk("./data"):
+        for file in files:
+            if file.endswith(".yaml") or file.endswith(".yml"):
+                with open(f"{path}/{file}", 'r') as f:
+                    data = yaml.safe_load(f)
+                with open(f"{path}/{file.split('.')[0]}.json", 'w') as f:
+                    json.dump(data, f)
+                os.remove(f"{path}/{file}")
+
+def json_to_yaml():
+    for path, dirs, files in os.walk("./data"):
+        for file in files:
+            if file.endswith(".json"):
+                with open(f"{path}/{file}", 'r') as f:
+                    data = json.load(f)
+                with open(f"{path}/{file.split('.')[0]}.yaml", 'w') as f:
+                    yaml.dump(data, f)
+                os.remove(f"{path}/{file}")
+
 
 def save(file, bock = None):
     pass
