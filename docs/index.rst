@@ -19,4 +19,8 @@ Project report: https://fr.overleaf.com/read/bvgsgsgdmdtv
    :maxdepth: 2
    :caption: Technical documentation
 
-   class.block
+   classes.block
+   classes.rate
+   classes.triplet
+   classes.shot
+   classes.ccd

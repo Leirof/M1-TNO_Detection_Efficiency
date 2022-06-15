@@ -1,0 +1,3 @@
+# `classes.ccd.CCD`
+
+> TODO

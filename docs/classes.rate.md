@@ -1,0 +1,3 @@
+# `classes.rate.Rate`
+
+> TODO

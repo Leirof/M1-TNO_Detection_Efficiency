@@ -1,0 +1,3 @@
+# `classes.shot.Shot`
+
+> TODO
