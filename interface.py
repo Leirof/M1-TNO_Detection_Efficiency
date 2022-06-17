@@ -19,10 +19,13 @@ from classes.block import Block
 from classes.triplet import Triplet
 from classes.shot import Shot
 from classes.ccd import CCD
+from classes.rate import Rate
 import os
 from astropy.io import fits
 from numpy import *
 from utils.term import *
+import re
+from scipy.optimize import curve_fit
 
 #    _____      _      ____  _     _           _         _      _     _   
 #   / ____|    | |    / __ \| |   (_)         | |       | |    (_)   | |  
@@ -94,14 +97,66 @@ def connectData(verbose=False):
 #                        | |                                _/ |                  
 #                        |_|                               |__/                                                                                                                                                                                                                        
 
+# OPTIONAL
 def loadBlock(block):
     """This function use the informations contained in the block object to find the corresponding data and fill the missing parts"""
     return block
 
+# OPTIONAL
 def loadTriplet(triplet):
     """This function use the informations contained in the triplet object to find the corresponding data and fill the missing parts"""
+    for shot in triplet.shotList:
+        for file in os.listdir("H:\Lab_Project\Triplets\Split_triplets"):
+            if shot.id in file:
+                ft, fs = get_params_from_fake_objects(file)
+                triplet.rates.append(Rate(parent=triplet, func = "tan", a=ft[0], b=ft[1], c=ft[2], d=ft[3]))
+                triplet.rates.append(Rate(parent=triplet, func = "square", a=fs[0], b=fs[1], c=fs[2], d=fs[3]))
+                return triplet
     return triplet
 
+# CUSTOM
+def get_params_from_fake_objects(file):
+    path = "H:/Lab_Project/Triplets/Split_triplets"
+
+    detected = []
+    undetected = []
+    with open(f"{path}/1615904.fake","r") as f:
+        for line in f:
+            if line.startswith("#"): continue
+            data = line.split()
+            if data[7] in ["--","0.000"]: 
+                undetected.append(float(data[2]))
+            else: detected.append(float(data[2]))
+
+    detected = array(detected)
+    undetected = array(undetected)
+
+    m,step = linspace(21,25.5,50, retstep=True)
+
+    eff = empty_like(m)
+
+    for i,x in enumerate(m):
+        numDetected = sum((x - step/2 <= detected) * (detected < x + step/2))
+        numUndetected = sum((x - step/2 <= undetected) * (undetected < x + step/2))
+        if numDetected + numUndetected == 0: eff[i] = 0
+        else: eff[i] = numDetected / (numDetected + numUndetected)
+
+    def ft(m,a,b,c,d):
+        return a/4 * (1-tanh((m-b)/c)) * (1-tanh((m-b)/d))
+
+    def fs(m,a,b,c,d):
+        return (a-b*(m-21)**2) / (1+exp((m-c)/d))
+
+    param = [0.5,21,0.5,0.5]
+    paramft = curve_fit(ft,m,eff,param)
+
+    param = [0.5,0.5,21,0.5]
+    paramfs = curve_fit(fs,m,eff,param)
+
+    return paramft[0], paramfs[0]
+
+
+# OPTIONAL
 def loadShot(shot, verbose=False, prefix=""):
     """This function use the informations contained in the shot object to find the corresponding data and fill the missing parts"""
     try: hdul = fits.open(os.path.join(shot.dataPath,f"{shot.id}p.fits.fz"))
@@ -118,9 +173,9 @@ def loadShot(shot, verbose=False, prefix=""):
         except TypeError as e:
             print("CCD :",ccd.id)
             raise e
-
     return shot
 
+# OPTIONAL
 def loadCCD(ccd):
     """This function use the informations contained in the CCD object to find the corresponding data and fill the missing parts"""
 

@@ -1,11 +1,10 @@
 from numpy import *
-from classes.block import Block
 
 class Rate():
-    __slots__ = ('block','func','min_vel','max_vel','a','b','c','d')
+    __slots__ = ('parent','func','min_vel','max_vel','a','b','c','d')
 
-    def __init__(self, block=None, func=None, min_vel=None, max_vel=None, a=None, b=None, c=None, d=None):
-        self.block      :Block  = block
+    def __init__(self, parent=None, func=None, min_vel=None, max_vel=None, a=None, b=None, c=None, d=None):
+        self.parent             = parent
         self.func       :str    = func
         self.min_vel    :float  = min_vel
         self.max_vel    :float  = max_vel

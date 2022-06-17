@@ -31,7 +31,7 @@ def loadSerialized(file):
             if "tan" in rate_value:    func = "tan"
 
             block.rates.append(Rate(
-                block   = block,
+                parent   = block,
                 func    = func,
                 min_vel = rate_value["min"],
                 max_vel = rate_value["max"],
@@ -74,14 +74,16 @@ def loadSerialized(file):
                                                     ])
 
 def loadAll(path = "./data"):
-    for folder in os.listdir(path):
-        if os.path.isdir(f"./data/{folder}"):
-            for file in os.listdir(f"./data/{folder}"):
-                if file.endswith(".yaml") or file.endswith(".yml") or file.endswith(".json"):
-                    if file.split('.')[0] in Block.all: print(f"Block {file.split('.')[0]} is already loaded.")
-                    else:
-                        print(f"Loading {file}")
-                        loadSerialized(f"./data/{folder}/{file}")
+    for file in os.listdir(path):
+        if file.endswith(".yaml") or file.endswith(".yml") or file.endswith(".json"):
+            if file.split('.')[0] in Block.all: print(f"Block {file.split('.')[0]} is already loaded.")
+            else:
+                print(f"Loading {file}")
+                loadSerialized(f"{path}/{file}")
+
+def saveAll(folder = "./data", indent = None):
+    for _, block in Block.all.items():
+        block.save(folder, indent = indent)
 
 def get_ai_ready(useExisting = True, func = "tan", vel = 4.5, maxTriplet = 8, maxCCD = 36, randomTriplet = True, randomCCD = True, subsets_per_block=1):
     # if useExisting:
@@ -123,7 +125,3 @@ def json_to_yaml():
                 with open(f"{path}/{file.split('.')[0]}.yaml", 'w') as f:
                     yaml.dump(data, f)
                 os.remove(f"{path}/{file}")
-
-
-def save(file, bock = None):
-    pass # TODO

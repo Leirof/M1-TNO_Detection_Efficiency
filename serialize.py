@@ -1,3 +1,6 @@
+OUTPUT = "./data"
+split_by = "block" # "triplet"
+
 import interface
 from classes.block import Block
 from classes.triplet import Triplet
