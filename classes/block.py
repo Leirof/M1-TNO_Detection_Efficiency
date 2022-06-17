@@ -38,10 +38,11 @@ class Block():
         with open(os.path.join(folder,f'{self.id}.json'), 'w') as fp:
             json.dump({f"block {self.id}": self.to_dict()}, fp, indent=indent)
 
-    def to_ai_ready(self, func = None, vel = 4.5, maxTriplet = 8, maxCCD = 36, randomTriplet = True, randomCCD = True):
+    def to_ai_ready(self, func = None, vel = 4.5, maxTriplet = 8, maxCCD = 36, randomTriplet = True, randomCCD = True, **kwargs):
         block_data = []
         already_selected = []
         rate_data = None
+        outputs = 0
         for i in range(maxTriplet):
 
             if randomTriplet:
@@ -50,21 +51,21 @@ class Block():
                     r = random.randint(0,len(self.tripletList))
             else: r = i
 
-            triplet_data = self.tripletList[r].to_ai_ready(withrate = False, func = func, vel = vel, maxCCD = maxCCD, randomCCD = randomCCD)
+            triplet_data, _ = self.tripletList[r].to_ai_ready(withrate = False, func = func, vel = vel, maxCCD = maxCCD, randomCCD = randomCCD)
             block_data.append(triplet_data)
 
         block_data = array(block_data).reshape(len(block_data)*len(triplet_data))
 
         # Check if the desired detection rate was already measured for this block
         for rate in self.rates:
-            if vel == None or (rate.min_vel <= vel and vel <= rate.max_vel):
+            if vel is None or rate.min_vel is None or rate.max_vel is None or (rate.min_vel <= vel and vel <= rate.max_vel):
                 if func is None or rate.func == func:
                     rate_data = rate.to_ai_ready()
-                    break
+                    outputs += 4
 
         if rate_data is None:
-            return None
+            return None, None
         else:
-            return concatenate((block_data,rate_data))
+            return concatenate((block_data,rate_data)), outputs
 
         

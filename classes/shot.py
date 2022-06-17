@@ -31,7 +31,7 @@ class Shot():
             d.update({f"ccd {ccd.id}":ccd.to_dict()})
         return {'id':self.id,'ccdList':d}
 
-    def to_ai_ready(self, maxCCD = 36, randomCCD = True):
+    def to_ai_ready(self, maxCCD = 36, randomCCD = True, **kwargs):
         shot_data = []
         already_selected = []
         for i in range(maxCCD):

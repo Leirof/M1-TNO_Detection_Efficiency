@@ -35,8 +35,9 @@ class Triplet():
             r.update({f"Detection rate using function {rate.func} for velocity {min_vel}-{max_vel}":rate.to_dict()})
         return {'id':self.id,'rates':r,'shotList':d}
 
-    def to_ai_ready(self, withrate = True, func = None, vel = 4.5, maxCCD = 36, randomCCD = True):
+    def to_ai_ready(self, withrate = True, func = None, vel = 4.5, maxCCD = 36, randomCCD = True, **kwargs):
         triplet_data = []
+        outputs = 0
         for shot in self.shotList:
             shot_data = shot.to_ai_ready(maxCCD = maxCCD, randomCCD = randomCCD)
             triplet_data.append(shot_data)
@@ -44,12 +45,13 @@ class Triplet():
 
         rate_data = None
         for rate in self.rates:
-            if vel == None or (rate.min_vel <= vel and vel <= rate.max_vel):
+            if vel is None or rate.min_vel is None or rate.max_vel is None or (rate.min_vel <= vel and vel <= rate.max_vel):
                 if func is None or rate.func == func:
+                    outputs += 4
                     rate_data = rate.to_ai_ready()
                     break
 
         if rate_data is None:
-            return None
+            return None, None
         else:
-            return concatenate((triplet_data,rate_data))
+            return concatenate((triplet_data,rate_data)), outputs

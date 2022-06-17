@@ -46,6 +46,22 @@ def loadSerialized(file):
         for triplet_key, triplet_value in block_value["tripletList"].items():
             triplet = Triplet(id=triplet_value["id"], block=block)
 
+            for rate_key, rate_value in triplet_value["rates"].items():
+
+                if "square" in rate_value: func = "square"
+                if "tan" in rate_value:    func = "tan"
+
+                triplet.rates.append(Rate(
+                    parent  =  triplet,
+                    func    = func,
+                    min_vel = rate_value["min"],
+                    max_vel = rate_value["max"],
+                    a       = rate_value[func]["a"],
+                    b       = rate_value[func]["b"],
+                    c       = rate_value[func]["c"],
+                    d       = rate_value[func]["d"]
+                ))
+
             triplet_data = []
             for shot_key, shot_value in triplet_value["shotList"].items():
                 shot = Shot(id=shot_value["id"], triplet=triplet, block=block)
@@ -85,25 +101,32 @@ def saveAll(folder = "./data", indent = None):
     for _, block in Block.all.items():
         block.save(folder, indent = indent)
 
-def get_ai_ready(useExisting = True, func = "tan", vel = 4.5, maxTriplet = 8, maxCCD = 36, randomTriplet = True, randomCCD = True, subsets_per_block=1):
+def get_ai_ready(items = Block.all, useExisting = True, func = "tan", vel = 4.5, maxTriplet = 8, maxCCD = 36, randomTriplet = True, randomCCD = True, subsets_per_block=1):
     # if useExisting:
     #     try:    return load("data/ai_ready.npz")["data"]
     #     except: print("No data already available")
     data = []
-    for _, block in Block.all.items():
+
+    itemList = []
+
+    if type(items) == dict:
+        for _, value in items.items():
+            itemList.append(value)
+
+    for item in itemList:
         i = 0
         while i<subsets_per_block:
-            block_data = block.to_ai_ready(func, vel, maxTriplet, maxCCD, randomTriplet, randomCCD)
-            if block_data is None:
+            item_data, outputs = item.to_ai_ready(func = func, vel = vel, maxTriplet = maxTriplet, maxCCD = maxCCD, randomTriplet = randomTriplet, randomCCD = randomCCD)
+            if item_data is None:
                 break
             # if block_data in data:
             #     continue
-            data.append(block_data)
+            data.append(item_data)
             i+=1
     
     data = array(data)
     # savez_compressed("data/ai_ready", data = data)
-    return data
+    return data, outputs
 
 
 def yaml_to_json():

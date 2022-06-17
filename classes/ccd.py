@@ -144,7 +144,7 @@ class CCD():
         return dict
 
     # Export in numpy array that can be used to train an ai (need to be normalized before)
-    def to_ai_ready(self):
+    def to_ai_ready(self, **kwargs):
         return array(   [   self.background_median,
                             self.background_average,
                             self.background_std,

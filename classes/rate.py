@@ -3,6 +3,8 @@ from numpy import *
 class Rate():
     __slots__ = ('parent','func','min_vel','max_vel','a','b','c','d')
 
+    all = []
+
     def __init__(self, parent=None, func=None, min_vel=None, max_vel=None, a=None, b=None, c=None, d=None):
         self.parent             = parent
         self.func       :str    = func
@@ -12,6 +14,7 @@ class Rate():
         self.b          :float  = b
         self.c          :float  = c
         self.d          :float  = d
+        Rate.all.append(self)
 
     def to_dict(self):
         return {"min":self.min_vel,
@@ -23,5 +26,5 @@ class Rate():
                     'd':self.d
                 }}
     
-    def to_ai_ready(self):
+    def to_ai_ready(self, **kwargs):
         return array([self.a,self.b,self.c,self.d])
