@@ -105,10 +105,11 @@ def loadBlock(block):
 # OPTIONAL
 def loadTriplet(triplet):
     """This function use the informations contained in the triplet object to find the corresponding data and fill the missing parts"""
+    path = "H:/Lab_Project/Triplets/Split_triplets"
     for shot in triplet.shotList:
-        for file in os.listdir("H:\Lab_Project\Triplets\Split_triplets"):
+        for file in os.listdir(path):
             if shot.id in file:
-                ft, fs = get_params_from_fake_objects(file)
+                ft, fs = get_params_from_fake_objects(f"{path}/{file}")
                 triplet.rates.append(Rate(parent=triplet, func = "tan", a=ft[0], b=ft[1], c=ft[2], d=ft[3]))
                 triplet.rates.append(Rate(parent=triplet, func = "square", a=fs[0], b=fs[1], c=fs[2], d=fs[3]))
                 return triplet
@@ -116,17 +117,23 @@ def loadTriplet(triplet):
 
 # CUSTOM
 def get_params_from_fake_objects(file):
-    path = "H:/Lab_Project/Triplets/Split_triplets"
-
     detected = []
     undetected = []
-    with open(f"{path}/1615904.fake","r") as f:
+    with open(file,"r") as f:
+        cpt = 0
         for line in f:
+            cpt += 1
             if line.startswith("#"): continue
             data = line.split()
-            if data[7] in ["--","0.000"]: 
-                undetected.append(float(data[2]))
-            else: detected.append(float(data[2]))
+            if data[2] == "mag": continue
+            try:
+                if data[7] in ["--","0.000"]: 
+                    undetected.append(float(data[2]))
+                else: detected.append(float(data[2]))
+            except:
+                print("Error in file",file,"line",cpt)
+                print(line)
+                raise
 
     detected = array(detected)
     undetected = array(undetected)
