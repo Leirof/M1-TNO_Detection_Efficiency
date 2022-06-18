@@ -2,5 +2,5 @@
 
 Project report: https://fr.overleaf.com/read/bvgsgsgdmdtv
 
-Technical documentation: 
+Technical documentation: https://m1-tno-detection-efficiency.readthedocs.io
 
