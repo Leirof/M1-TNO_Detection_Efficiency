@@ -55,7 +55,7 @@ class Block():
             block_data.append(triplet_data)
 
         block_data = array(block_data)
-        try: block_data = block_data.reshape(len(block_data),len(triplet_data))
+        try: block_data = block_data.reshape(len(block_data)*len(triplet_data))
         except:
             print(self.id)
             print(block_data.shape)
@@ -73,6 +73,11 @@ class Block():
         if rate_data is None:
             return None, None
         else:
-            return concatenate((block_data,rate_data)), outputs
+            try: return concatenate((block_data,rate_data)), outputs
+            except:
+                print(self.id)
+                print(block_data.shape)
+                print(rate_data.shape)
+                raise
 
         

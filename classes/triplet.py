@@ -43,6 +43,8 @@ class Triplet():
             triplet_data.append(shot_data)
         triplet_data = array(triplet_data).reshape(len(triplet_data)*len(shot_data))
 
+        if not withrate: return triplet_data, None
+
         rate_data = None
         for rate in self.rates:
             if vel is None or rate.min_vel is None or rate.max_vel is None or (rate.min_vel <= vel and vel <= rate.max_vel):
@@ -52,6 +54,6 @@ class Triplet():
                     break
 
         if rate_data is None:
-            return triplet_data, None
+            return None, None
         else:
             return concatenate((triplet_data,rate_data)), outputs

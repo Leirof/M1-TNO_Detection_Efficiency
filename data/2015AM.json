@@ -2,6 +2,16 @@
     "block 2015AM": {
         "id": "2015AM",
         "rates": {
+            "Detection rate using function square for velocity 6.0-2.0": {
+                "min": 2.0,
+                "max": 6.0,
+                "square": {
+                    "a": 0.916795731,
+                    "b": 0.0127213169,
+                    "c": 24.9023361,
+                    "d": 0.148992002
+                }
+            },
             "Detection rate using function tan for velocity 6.0-2.0": {
                 "min": 2.0,
                 "max": 6.0,
@@ -10,12 +20,6 @@
                     "b": 25.0355072,
                     "c": 0.907369375,
                     "d": 0.244212627
-                },
-                "square": {
-                    "a": 0.916795731,
-                    "b": 1.27213169E-02,
-                    "c": 24.9023361,
-                    "d": 0.148992002
                 }
             }
         },

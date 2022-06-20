@@ -2,6 +2,16 @@
     "block 2013AO": {
         "id": "2013AO",
         "rates": {
+            "Detection rate using function square for velocity 7.0-0.5": {
+                "min": 0.5,
+                "max": 7.0,
+                "square": {
+                    "a": 0.841375411,
+                    "b": 0.0205407962,
+                    "c": 24.5497284,
+                    "d": 0.110739127
+                }
+            },
             "Detection rate using function tan for velocity 7.0-0.5": {
                 "min": 0.5,
                 "max": 7.0,
@@ -10,12 +20,6 @@
                     "b": 24.5337582,
                     "c": 7.76117039,
                     "d": 0.229197711
-                },
-                "square": {
-                    "a": 0.841375411,
-                    "b": 2.05407962E-02,
-                    "c": 24.5497284,
-                    "d": 0.110739127
                 }
             }
         },
