@@ -54,7 +54,14 @@ class Block():
             triplet_data, _ = self.tripletList[r].to_ai_ready(withrate = False, func = func, vel = vel, maxCCD = maxCCD, randomCCD = randomCCD)
             block_data.append(triplet_data)
 
-        block_data = array(block_data).reshape(len(block_data)*len(triplet_data))
+        block_data = array(block_data)
+        try: block_data = block_data.reshape(len(block_data),len(triplet_data))
+        except:
+            print(self.id)
+            print(block_data.shape)
+            print(type(block_data))
+            raise
+        
 
         # Check if the desired detection rate was already measured for this block
         for rate in self.rates:

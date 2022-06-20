@@ -52,6 +52,6 @@ class Triplet():
                     break
 
         if rate_data is None:
-            return None, None
+            return triplet_data, None
         else:
             return concatenate((triplet_data,rate_data)), outputs

@@ -27,19 +27,28 @@ def loadSerialized(file):
 
         for rate_key, rate_value in block_value["rates"].items():
 
-            if "square" in rate_value: func = "square"
-            if "tan" in rate_value:    func = "tan"
-
-            block.rates.append(Rate(
-                parent   = block,
-                func    = func,
-                min_vel = rate_value["min"],
-                max_vel = rate_value["max"],
-                a       = rate_value[func]["a"],
-                b       = rate_value[func]["b"],
-                c       = rate_value[func]["c"],
-                d       = rate_value[func]["d"]
-            ))
+            if "square" in rate_value:
+                block.rates.append(Rate(
+                    parent  = block,
+                    func    = "square",
+                    min_vel = rate_value["min"],
+                    max_vel = rate_value["max"],
+                    a       = rate_value["square"]["a"],
+                    b       = rate_value["square"]["b"],
+                    c       = rate_value["square"]["c"],
+                    d       = rate_value["square"]["d"]
+                ))
+            if "tan" in rate_value:
+                block.rates.append(Rate(
+                    parent  = block,
+                    func    = "tan",
+                    min_vel = rate_value["min"],
+                    max_vel = rate_value["max"],
+                    a       = rate_value["tan"]["a"],
+                    b       = rate_value["tan"]["b"],
+                    c       = rate_value["tan"]["c"],
+                    d       = rate_value["tan"]["d"]
+                ))
 
         block_data = []
         triplet_count = 0
