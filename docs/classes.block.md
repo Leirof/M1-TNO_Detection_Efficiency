@@ -1,4 +1,6 @@
-# `classes.block.Block`
+# `class Block`
+
+`classes.block.Block(id, tripletList=None, rates=None, dataPath = None)`
 
 ## Class attributes
 
@@ -23,37 +25,37 @@ No methods in this class
 
 ## Object methods
 
-### `unload(self)`
+### `unload()`
 
 Delete the object and all associated triplets to clear memory.
 
-**inputs**:
-- `self : Block`: instance of the `block` object you want to unload.
+**inputs**: None
 
 **Returns**: None
 
-### `to_dict(self)`
+### `to_dict()`
 
-Return a dictionary containing all the object informations. Useful to save it in a JSON or YAML format.
+Return a dictionary containing all the object informations. Useful to save it in a JSON format.
 
-**inputs**:
-- `self : Block`: instance of the `block` object you want to get as dictionary.
+**inputs**: None
 
 **Returns**:
+
 - `dict`: The containing all the object informations
 
-### `to_ai_ready(self)`
+### `to_ai_ready(func = None, vel = 4.5, maxTriplet = 8, maxCCD = 36, randomTriplet = True, randomCCD = True, **kwargs)`
 
 Return a vector that can be used to train the AI.
 
 **inputs**:
-- `self : Block`: instance of the `block` object you want to get as vector.
-- `func : str = None` (optional): the type of function for which the parameters will be returned. Must be `tan` for the double tangent form or `square` for the exponential form. You can also precise no function to get both (8 output parameters instead of 4).
-- `vel : float = 4.5`: the volocity for which you want to get the function parameters. The default value correspond to the need of the original data set of used in this project.
-- `maxTriplet : int = 8` the minimum number of triplet included in the considered blocks. The default value correspond to the need of the original data set of used in this project. Be careful: if a considered block contain less triplets than this number, the output vectors will don't have the same dimension, which will lead to errors.
-- `maxCCD : int = 36`the minimum number of CCD included in the considered triplets. The default value correspond to the need of the original data set of used in this project. Be careful: if a considered triplet contain less CCD than this number, the output vectors will don't have the same dimension, which will lead to errors.
-- `randomTriplet : bool = True` if all blocks doesn't have the same amount of triplet, this parameter allow to select the triplet randomly if it's set to `True`. Otherwise, it will take the first ones.
-- - `randomCCD : bool = True` if all triplets doesn't have the same amount of CCD, this parameter allow to select the triplet randomly if it's set to `True`. Otherwise, it will take the first ones.
+
+- `func : str` (optional): the type of function for which the parameters will be returned. Must be `tan` for the double tangent form or `square` for the exponential form. You can also precise no function to get both (8 output parameters instead of 4).
+- `vel : float`: the volocity for which you want to get the function parameters. The default value correspond to the need of the original data set of used in this project.
+- `maxTriplet : int` the minimum number of triplet included in the considered blocks. The default value correspond to the need of the original data set of used in this project. Be careful: if a considered block contain less triplets than this number, the output vectors will don't have the same dimension, which will lead to errors.
+- `maxCCD : int`the minimum number of CCD included in the considered triplets. The default value correspond to the need of the original data set of used in this project. Be careful: if a considered triplet contain less CCD than this number, the output vectors will don't have the same dimension, which will lead to errors.
+- `randomTriplet : bool` if all blocks doesn't have the same amount of triplet, this parameter allow to select the triplet randomly if it's set to `True`. Otherwise, it will take the first ones.
+- - `randomCCD : bool` if all triplets doesn't have the same amount of CCD, this parameter allow to select the triplet randomly if it's set to `True`. Otherwise, it will take the first ones.
 
 **Returns**:
+
 - `ndarray`: A Numpy vector containing the input and the output (4 or 8 last elements of the vector)
