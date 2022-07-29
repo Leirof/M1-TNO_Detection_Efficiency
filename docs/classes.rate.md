@@ -1,4 +1,4 @@
-# `class Rate`
+# class Rate
 
 `classes.rate.Rate(parent=None, func=None, min_vel=None, max_vel=None, a=None, b=None, c=None, d=None)`
 
@@ -71,6 +71,9 @@ Return an array containing the value of the efficiency curve according to the ra
 
 **Parameters**
 - `mag : ndarray` magnitudes for which the function will be evaluated. By default, mag contain 1000 equally distant points in a range of magnitude contained between 21 and 26. 
+
+**Returns**
+- `ndarray` Array containing the efficiency of detection for all the magnitude given in parameter.
 
 ### to_disct
 

@@ -1,4 +1,4 @@
-# `class Shot`
+# class Shot
 
 `classes.shot.Shot(id, ccdList=None, triplet=None, block=None, dataPath=None)`
 

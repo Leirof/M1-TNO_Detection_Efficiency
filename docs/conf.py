@@ -46,6 +46,15 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # a list of builtin themes.
 #
 html_theme = 'sphinx_book_theme'#'alabaster'
+html_theme_options = {
+    "home_page_in_toc": False,
+    "github_url": "https://github.com/LeiRoF/M1-TNO_Detection_Efficiency",
+    "repository_url": "https://github.com/LeiRoF/M1-TNO_Detection_Efficiency",
+    "repository_branch": "master",
+    "path_to_docs": "docs",
+    "use_repository_button": True,
+    "use_edit_page_button": True,
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

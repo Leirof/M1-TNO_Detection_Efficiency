@@ -1,4 +1,4 @@
-# `class CCD`
+# class CCD
 
 `classes.ccd.CCD(id = None, data:ndarray = None, shot:Shot = None, triplet:Triplet = None, block:Block = None, dataPath:str = None)`
 

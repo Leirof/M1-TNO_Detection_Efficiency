@@ -1,4 +1,4 @@
-# `class Block`
+# class Block
 
 `classes.block.Block(id, tripletList=None, rates=None, dataPath = None)`
 

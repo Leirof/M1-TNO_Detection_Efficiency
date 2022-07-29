@@ -1,4 +1,4 @@
-# `class Triplet`
+# class Triplet
 
 `classes.triplet.Triplet(id, tripletList=None, rates=None, dataPath = None)`
 
