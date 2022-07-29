@@ -16,6 +16,13 @@ class Rate():
         self.d          :float  = d
         Rate.all.append(self)
 
+    def points(self,mag = linspace(21,26,1000,endpoint=True)):
+        if self.func == "tan":
+            return self.a / 4 * (1 - tanh((mag - self.b) / self.c)) * (1 - tanh((mag - self.b) / self.d))
+        if self.func == "square":
+            return (self.a - self.b * (mag - 21)^2) / (1 + exp((mag - self.c)/self.d))
+        raise ValueError('func attribute of Rate object must be "tan" or "square"')
+
     def to_dict(self):
         return {"min":self.min_vel,
                 "max":self.max_vel,
